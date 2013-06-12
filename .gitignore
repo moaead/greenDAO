@@ -1,7 +1,22 @@
-#IntelliJ IDEA
-.idea
-*.iml
-*.ipr
+# Java class files
+*.class
+
+# generated files
+bin/
+gen/
+out/
+build/
+.gradle/
+
+# Local configuration file (sdk path, etc)
+.idea/workspace.xml
+default.properties
+local.properties
+.metadata
+.settings
+.DS_Store
+proguard-project.txt
+*~
+
+# Idea non-crucial project fileS
 *.iws
-classes
-gen-external-apklibs
