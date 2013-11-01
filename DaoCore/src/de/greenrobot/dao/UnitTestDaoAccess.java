@@ -19,7 +19,7 @@ package de.greenrobot.dao;
 import java.lang.reflect.Constructor;
 
 import android.database.Cursor;
-import net.sqlcipher.database.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabase;
 
 /** Reserved for internal unit tests that want to access some non-public methods. Don't use for anything else. */
 public class UnitTestDaoAccess<T, K> {

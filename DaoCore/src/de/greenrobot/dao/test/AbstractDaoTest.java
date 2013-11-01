@@ -59,18 +59,17 @@ public abstract class AbstractDaoTest<D extends AbstractDao<T, K>, T, K> extends
         this.identityScopeForDao = identityScope;
     }
 
-    // TODO: Test disabled for SQLCipher implementation. 
     @SuppressWarnings("unchecked")
     @Override
     protected void setUp() {
         super.setUp();
-//        try {
-//            setUpTableForDao();
-//            daoAccess = new UnitTestDaoAccess<T, K>(db, (Class<AbstractDao<T, K>>) daoClass, identityScopeForDao);
-//            dao = (D) daoAccess.getDao();
-//        } catch (Exception e) {
-            throw new RuntimeException("Test Disabled"); //"Could not prepare DAO Test", e);
-//        }
+        try {
+            setUpTableForDao();
+            daoAccess = new UnitTestDaoAccess<T, K>(db, (Class<AbstractDao<T, K>>) daoClass, identityScopeForDao);
+            dao = (D) daoAccess.getDao();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not prepare DAO Test", e);
+        }
     }
 
     protected void setUpTableForDao() throws Exception {

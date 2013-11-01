@@ -18,7 +18,7 @@ package de.greenrobot.dao.async;
 
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.DaoException;
-import net.sqlcipher.database.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabase;
 
 /**
  * An operation that will be enqueued for asynchronous execution.

@@ -19,7 +19,7 @@ package de.greenrobot.dao;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabase;
 
 /**
  * The master of dao will guide you: start dao sessions with the master.

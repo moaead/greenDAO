@@ -17,7 +17,7 @@ package de.greenrobot.dao;
 
 import java.util.Collection;
 
-import net.sqlcipher.database.SQLiteStatement;
+import android.database.sqlite.SQLiteStatement;
 
 /**
  * A repeatable query for deleting entities.<br/>

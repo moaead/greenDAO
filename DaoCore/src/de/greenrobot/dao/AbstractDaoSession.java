@@ -22,7 +22,7 @@ import java.util.concurrent.Callable;
 
 import de.greenrobot.dao.async.AsyncSession;
 
-import net.sqlcipher.database.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabase;
 
 /**
  * DaoSession gives you access to your DAOs, offers convenient persistence methods, and also serves as a session cache.<br/>
