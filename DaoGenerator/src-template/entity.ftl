@@ -282,6 +282,7 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
 <#case "Boolean"><#case "boolean">source.readByte() == 1<#break/>
 <#case "java.util.Date">new Date(source.readLong())<#break/>
 <#case "Integer">source.readInt()<#break/>
+<#case "byte[]">source.createByteArray()<#break/>
 <#default>source.read${property.javaType?cap_first}()</#switch>;
 </#if>
 </#list>
@@ -310,6 +311,7 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
 <#case "Boolean"><#case "boolean">Byte((byte)(${pk.propertyName} ? 1 : 0))<#break/>
 <#case "java.util.Date">Long(${pk.propertyName}.getTime())<#break/>
 <#case "Integer">Int(${pk.propertyName})<#break/>
+<#case "byte[]">ByteArray(${pk.propertyName})<#break/>
 <#default>${pk.javaType?cap_first}(${pk.propertyName})</#switch>;
 </#list>
         } else {
@@ -323,6 +325,7 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
 <#case "Boolean"><#case "boolean">Byte((byte)(${property.propertyName} ? 1 : 0))<#break/>
 <#case "java.util.Date">Long(${property.propertyName}.getTime())<#break/>
 <#case "Integer">Int(${property.propertyName})<#break/>
+<#case "byte[]">ByteArray(${property.propertyName})<#break/>
 <#default>${property.javaType?cap_first}(${property.propertyName})</#switch>;
 </#if>
 </#list>
