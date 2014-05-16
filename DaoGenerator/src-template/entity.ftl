@@ -280,7 +280,7 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
     </#if>                model.${property.propertyName} = <#rt/>
 <#switch property.javaType>
 <#case "Boolean"><#case "boolean">source.readByte() == 1<#break/>
-<#case "java.util.Date">new Date(source.readLong())<#break/>
+<#case "java.util.Date">new java.util.Date(source.readLong())<#break/>
 <#case "Integer">source.readInt()<#break/>
 <#case "byte[]">source.createByteArray()<#break/>
 <#default>source.read${property.javaType?cap_first}()</#switch>;
