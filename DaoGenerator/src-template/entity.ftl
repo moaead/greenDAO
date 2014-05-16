@@ -240,6 +240,10 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
         myDao.refresh(this);
     }
 
+    /* package */ DaoSession getDaoSession() {
+        return daoSession;
+    }
+
 </#if>
 <#if entity.hasKeepSections>
     // KEEP METHODS - put your custom methods here
