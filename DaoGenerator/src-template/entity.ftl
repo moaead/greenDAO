@@ -259,7 +259,15 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
         public ${entity.className} createFromParcel(Parcel source) {
             if (source.readByte() == 1) {
                 try {
-                    return DocuSignDB.get(source.readString()).getSession().get${entity.classNameDao?cap_first}().queryBuilder().where(${entity.classNameDao?cap_first}.Properties.Id.eq(source.readLong())).uniqueOrThrow();
+                    return DocuSignDB.get(source.readString()).getSession().get${entity.classNameDao?cap_first}().queryBuilder().where(
+<#list entity.propertiesPk as pk>
+                            ${entity.classNameDao?cap_first}.Properties.${pk.propertyName?cap_first}.eq(<#switch pk.javaType>
+<#case "Boolean"><#case "boolean">source.readByte() == 1<#break/>
+<#case "java.util.Date">new Date(source.readLong())<#break/>
+<#case "Integer">source.readInt()<#break/>
+<#default>source.read${pk.javaType?cap_first}()</#switch>)<#if pk_has_next>,</#if>
+</#list>
+                    ).uniqueOrThrow();
                 } catch (DataProviderException e) {
                     throw new BadParcelableException(e);
                 }
@@ -297,7 +305,13 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
         if (daoSession != null && DocuSignDB.getDBName(daoSession.getDatabase()) != null) {
             dest.writeByte((byte)1);
             dest.writeString(DocuSignDB.getDBName(daoSession.getDatabase()));
-            dest.writeLong(id); // TODO: stop hardcoding "id" in parceling template - use propertiesPk
+<#list entity.propertiesPk as pk>
+            dest.write<#switch pk.javaType>
+<#case "Boolean"><#case "boolean">Byte((byte)(${pk.propertyName} ? 1 : 0))<#break/>
+<#case "java.util.Date">Long(${pk.propertyName}.getTime())<#break/>
+<#case "Integer">Int(${pk.propertyName})<#break/>
+<#default>${pk.javaType?cap_first}(${pk.propertyName})</#switch>;
+</#list>
         } else {
             dest.writeByte((byte)0);
 <#list entity.properties as property>
@@ -305,8 +319,7 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
 <#if boxedTypes?seq_contains(property.javaType)>
             dest.writeByte((byte)(${property.propertyName} == null ? 0 : 1));
             if (${property.propertyName} != null)
-    </#if>            dest.write<#rt/>
-<#switch property.javaType>
+    </#if>            dest.write<#switch property.javaType>
 <#case "Boolean"><#case "boolean">Byte((byte)(${property.propertyName} ? 1 : 0))<#break/>
 <#case "java.util.Date">Long(${property.propertyName}.getTime())<#break/>
 <#case "Integer">Int(${property.propertyName})<#break/>
