@@ -20,6 +20,7 @@ along with greenDAO Generator.  If not, see <http://www.gnu.org/licenses/>.
 <#assign toBindType = {"Boolean":"Long", "Byte":"Long", "Short":"Long", "Int":"Long", "Long":"Long", "Float":"Double", "Double":"Double", "String":"String", "ByteArray":"Blob" }/>
 <#assign toCursorType = {"Boolean":"Short", "Byte":"Short", "Short":"Short", "Int":"Int", "Long":"Long", "Float":"Float", "Double":"Double", "String":"String", "ByteArray":"Blob" }/>
 <#assign complexTypes = ["String", "ByteArray", "Date"]/>
+<#assign boxedTypes = ["Boolean", "Byte", "Short", "Integer", "Long", "Float", "Double", "java.util.Date"]/>
 package ${entity.javaPackage};
 
 <#if entity.toManyRelations?has_content>
@@ -28,6 +29,13 @@ import java.util.List;
 <#if entity.active>
 import ${schema.defaultJavaPackageDao}.DaoSession;
 import de.greenrobot.dao.DaoException;
+
+</#if>
+<#if entity.parcelable>
+import android.os.BadParcelableException;
+import android.os.Parcel;
+import android.os.Parcelable;
+import com.docusign.dataaccess.DataProviderException;
 
 </#if>
 <#if entity.additionalImportsEntity?has_content>
@@ -242,6 +250,70 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
 
     /* package */ DaoSession getDaoSession() {
         return daoSession;
+    }
+
+</#if>
+<#if entity.parcelable>
+    public static final Parcelable.Creator<${entity.className}> CREATOR = new Parcelable.Creator<${entity.className}>() {
+        @Override
+        public ${entity.className} createFromParcel(Parcel source) {
+            if (source.readByte() == 1) {
+                try {
+                    return DocuSignDB.get(source.readString()).getSession().get${entity.classNameDao?cap_first}().queryBuilder().where(${entity.classNameDao?cap_first}.Properties.Id.eq(source.readLong())).uniqueOrThrow();
+                } catch (DataProviderException e) {
+                    throw new BadParcelableException(e);
+                }
+            } else {
+                ${entity.className} model = new ${entity.className}();
+<#list entity.properties as property>
+<#if !entity.propertiesPk?seq_contains(property)>
+<#if boxedTypes?seq_contains(property.javaType)>
+                if (source.readByte() == 1)
+    </#if>                model.${property.propertyName} = <#rt/>
+<#switch property.javaType>
+<#case "Boolean"><#case "boolean">source.readByte() == 1<#break/>
+<#case "java.util.Date">new Date(source.readLong())<#break/>
+<#case "Integer">source.readInt()<#break/>
+<#default>source.read${property.javaType?cap_first}()</#switch>;
+</#if>
+</#list>
+                return model;
+            }
+        }
+
+        @Override
+        public ${entity.className}[] newArray(int size) {
+            return new ${entity.className}[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (daoSession != null && DocuSignDB.getDBName(daoSession.getDatabase()) != null) {
+            dest.writeByte((byte)1);
+            dest.writeString(DocuSignDB.getDBName(daoSession.getDatabase()));
+            dest.writeLong(id); // TODO: stop hardcoding "id" in parceling template - use propertiesPk
+        } else {
+            dest.writeByte((byte)0);
+<#list entity.properties as property>
+<#if !entity.propertiesPk?seq_contains(property)>
+<#if boxedTypes?seq_contains(property.javaType)>
+            dest.writeByte((byte)(${property.propertyName} == null ? 0 : 1));
+            if (${property.propertyName} != null)
+    </#if>            dest.write<#rt/>
+<#switch property.javaType>
+<#case "Boolean"><#case "boolean">Byte((byte)(${property.propertyName} ? 1 : 0))<#break/>
+<#case "java.util.Date">Long(${property.propertyName}.getTime())<#break/>
+<#case "Integer">Int(${property.propertyName})<#break/>
+<#default>${property.javaType?cap_first}(${property.propertyName})</#switch>;
+</#if>
+</#list>
+        }
     }
 
 </#if>

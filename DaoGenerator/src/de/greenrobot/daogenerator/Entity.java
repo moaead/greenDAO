@@ -77,6 +77,7 @@ public class Entity {
     private boolean skipTableCreation;
     private Boolean active;
     private Boolean hasKeepSections;
+    private Boolean parcelable;
 
     Entity(Schema schema, String className) {
         this.schema = schema;
@@ -405,6 +406,19 @@ public class Entity {
         return hasKeepSections;
     }
 
+    public void setParcelable(Boolean parcelable) {
+        this.parcelable = parcelable;
+        if (parcelable) {
+            interfacesToImplement.add("android.os.Parcelable");
+        } else {
+            interfacesToImplement.remove("android.os.Parcelable");
+        }
+    }
+
+    public Boolean getParcelable() {
+        return parcelable;
+    }
+
     public Collection<String> getAdditionalImportsEntity() {
         return additionalImportsEntity;
     }
@@ -488,6 +502,10 @@ public class Entity {
 
         if (hasKeepSections == null) {
             hasKeepSections = schema.isHasKeepSectionsByDefault();
+        }
+
+        if (parcelable == null) {
+            setParcelable(schema.isParcelableEntitiesByDefault());
         }
 
         init2ndPassIndexNamesWithDefaults();
