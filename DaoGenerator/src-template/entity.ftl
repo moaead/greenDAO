@@ -35,7 +35,7 @@ import de.greenrobot.dao.DaoException;
 import android.os.BadParcelableException;
 import android.os.Parcel;
 import android.os.Parcelable;
-import de.greenrobot.dao.DaoException;
+import com.docusign.dataaccess.DataProviderException;
 
 </#if>
 <#if entity.additionalImportsEntity?has_content>
@@ -266,7 +266,7 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
                                     <#case "Integer">source.readInt()<#break/>
                                     <#default>source.read${pk.javaType?cap_first}()</#switch>)<#if pk_has_next>,</#if></#list>)
                             .uniqueOrThrow();
-                } catch (DaoException e) {
+                } catch (DataProviderException e) {
                     throw new BadParcelableException(e);
                 }
             } else {
