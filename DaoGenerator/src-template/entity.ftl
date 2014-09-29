@@ -35,7 +35,7 @@ import de.greenrobot.dao.DaoException;
 import android.os.BadParcelableException;
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.docusign.dataaccess.DataProviderException;
+import de.greenrobot.dao.DaoException;
 
 </#if>
 <#if entity.additionalImportsEntity?has_content>
@@ -259,16 +259,14 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
         public ${entity.className} createFromParcel(Parcel source) {
             if (source.readByte() == 1) {
                 try {
-                    return DocuSignDB.get(source.readString()).getSession().get${entity.classNameDao?cap_first}().queryBuilder().where(
-<#list entity.propertiesPk as pk>
-                            ${entity.classNameDao?cap_first}.Properties.${pk.propertyName?cap_first}.eq(<#switch pk.javaType>
-<#case "Boolean"><#case "boolean">source.readByte() == 1<#break/>
-<#case "java.util.Date">new Date(source.readLong())<#break/>
-<#case "Integer">source.readInt()<#break/>
-<#default>source.read${pk.javaType?cap_first}()</#switch>)<#if pk_has_next>,</#if>
-</#list>
-                    ).uniqueOrThrow();
-                } catch (DataProviderException e) {
+                    return DocuSignDB.get(source.readString()).getSession().get${entity.classNameDao?cap_first}().queryBuilder()
+                            .where(<#list entity.propertiesPk as pk>${entity.classNameDao?cap_first}.Properties.${pk.propertyName?cap_first}.eq(<#switch pk.javaType>
+                                    <#case "Boolean"><#case "boolean">source.readByte() == 1<#break/>
+                                    <#case "java.util.Date">new Date(source.readLong())<#break/>
+                                    <#case "Integer">source.readInt()<#break/>
+                                    <#default>source.read${pk.javaType?cap_first}()</#switch>)<#if pk_has_next>,</#if></#list>)
+                            .uniqueOrThrow();
+                } catch (DaoException e) {
                     throw new BadParcelableException(e);
                 }
             } else {
@@ -303,8 +301,9 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        if (daoSession != null && DocuSignDB.getDBName(daoSession.getDatabase()) != null) {
-            dest.writeByte((byte)1);
+        if (myDao != null && myDao.getKey(this) != null
+                && daoSession != null && DocuSignDB.getDBName(daoSession.getDatabase()) != null) {
+            dest.writeByte((byte) 1);
             dest.writeString(DocuSignDB.getDBName(daoSession.getDatabase()));
 <#list entity.propertiesPk as pk>
             dest.write<#switch pk.javaType>
@@ -315,7 +314,7 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
 <#default>${pk.javaType?cap_first}(${pk.propertyName})</#switch>;
 </#list>
         } else {
-            dest.writeByte((byte)0);
+            dest.writeByte((byte) 0);
 <#list entity.properties as property>
 <#if !entity.propertiesPk?seq_contains(property)>
 <#if boxedTypes?seq_contains(property.javaType)>
