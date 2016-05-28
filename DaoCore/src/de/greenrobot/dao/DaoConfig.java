@@ -45,7 +45,7 @@ public final class DaoConfig implements Cloneable {
 
     private IdentityScope<?, ?> identityScope;
 
-    DaoConfig(SQLiteDatabase db, Class<? extends AbstractDao<?, ?>> daoClass) {
+    public DaoConfig(SQLiteDatabase db, Class<? extends AbstractDao<?, ?>> daoClass) {
         this.db = db;
         try {
             this.tablename = (String) daoClass.getField("TABLENAME").get(null);
